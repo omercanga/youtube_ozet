@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy import Column, Integer, String, Text, DateTime, Date, UniqueConstraint
 from sqlalchemy.sql import func
 from .database import Base
 
@@ -38,3 +38,14 @@ class VideoAnalysis(Base):
     # Metadata
     language = Column(String(10))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class RateLimit(Base):
+    __tablename__ = "rate_limits"
+
+    id = Column(Integer, primary_key=True)
+    ip_address = Column(String(45), nullable=False)
+    date = Column(Date, nullable=False)
+    count = Column(Integer, default=0, nullable=False)
+
+    __table_args__ = (UniqueConstraint("ip_address", "date", name="uq_ip_date"),)

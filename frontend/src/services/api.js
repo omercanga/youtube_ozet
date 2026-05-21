@@ -48,6 +48,13 @@ export const analyzePlaylist = async (playlistUrl, videoIds, mode = 'individual'
   return response.data;
 };
 
+// --- Rate Limit ---
+
+export const getRateLimitStatus = async () => {
+  const response = await api.get('/api/rate-limit/status');
+  return response.data;
+};
+
 // --- History ---
 
 export const getHistory = async () => {

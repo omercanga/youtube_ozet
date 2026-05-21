@@ -89,6 +89,12 @@
       "details": "Alıntılar & Aksiyonlar"
     }
   },
+  "rateLimit": {
+    "label": "{{remaining}} / {{limit}} ücretsiz analiz hakkı kaldı",
+    "tooltip": "Bugün {{used}} / {{limit}} analiz kullandınız",
+    "exhausted": "Günlük ücretsiz limitiniz doldu. Yarın tekrar deneyin.",
+    "low": "Dikkat: Son 1 ücretsiz analiz hakkınız!"
+  },
   "history": {
     "title": "Geçmiş Analizler",
     "empty": "Henüz analiz yapılmamış.",

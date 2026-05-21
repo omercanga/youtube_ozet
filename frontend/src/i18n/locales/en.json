@@ -89,6 +89,12 @@
       "details": "Quotes & Actions"
     }
   },
+  "rateLimit": {
+    "label": "{{remaining}} / {{limit}} free analyses remaining today",
+    "tooltip": "Used {{used}} / {{limit}} analyses today",
+    "exhausted": "Daily free limit reached. Try again tomorrow.",
+    "low": "Warning: Only 1 free analysis left today!"
+  },
   "history": {
     "title": "Analysis History",
     "empty": "No analyses yet.",

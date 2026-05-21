@@ -6,6 +6,7 @@ import PlaylistForm from './components/PlaylistForm';
 import ResultDisplay from './components/ResultDisplay';
 import HistoryList from './components/HistoryList';
 import { analyzeVideo, analyzeManual, getAnalysisDetail } from './services/api';
+import RateLimitBadge from './components/RateLimitBadge';
 import './i18n';
 import './index.css';
 
@@ -15,6 +16,7 @@ function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [refreshHistory, setRefreshHistory] = useState(0);
+  const [rateLimitRefresh, setRateLimitRefresh] = useState(0);
   const [activeTab, setActiveTab] = useState('youtube');
 
   const handleAnalyze = async (url) => {
@@ -26,7 +28,9 @@ function App() {
       const data = await analyzeVideo(url);
       setResult(data);
       setRefreshHistory((prev) => prev + 1);
+      setRateLimitRefresh((prev) => prev + 1);
     } catch (err) {
+      setRateLimitRefresh((prev) => prev + 1);
       setError(err.response?.data?.detail || t('analyze.genericError'));
     } finally {
       setLoading(false);
@@ -42,7 +46,9 @@ function App() {
       const data = await analyzeManual(title, transcript, sourceUrl);
       setResult(data);
       setRefreshHistory((prev) => prev + 1);
+      setRateLimitRefresh((prev) => prev + 1);
     } catch (err) {
+      setRateLimitRefresh((prev) => prev + 1);
       setError(err.response?.data?.detail || t('analyze.genericError'));
     } finally {
       setLoading(false);
@@ -50,10 +56,10 @@ function App() {
   };
 
   const handlePlaylistResults = (results) => {
-    // Show the first result (or combined result)
     if (results && results.length > 0) {
       setResult(results[0]);
       setRefreshHistory((prev) => prev + 1);
+      setRateLimitRefresh((prev) => prev + 1);
     }
   };
 
@@ -88,9 +94,12 @@ function App() {
               <h1 className="header-title">{t('app.title')}</h1>
               <p className="header-subtitle">{t('app.subtitle')}</p>
             </div>
-            <button onClick={toggleLanguage} className="lang-switch" title={t('app.language')}>
-              {i18n.language === 'tr' ? '🇬🇧 EN' : '🇹🇷 TR'}
-            </button>
+            <div className="header-actions">
+              <RateLimitBadge refresh={rateLimitRefresh} />
+              <button onClick={toggleLanguage} className="lang-switch" title={t('app.language')}>
+                {i18n.language === 'tr' ? '🇬🇧 EN' : '🇹🇷 TR'}
+              </button>
+            </div>
           </div>
         </header>
 

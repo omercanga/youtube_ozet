@@ -17,6 +17,7 @@ from ..schemas import (
 )
 from ..services.youtube_service import YouTubeService
 from ..services.openai_service import OpenAIService
+from ..services.rate_limiter import check_and_increment, get_client_ip, get_status
 
 logger = logging.getLogger(__name__)
 
@@ -49,10 +50,26 @@ def get_ui_lang(request: Request) -> str:
 # --- Single Video Analysis ---
 
 
+@router.get("/rate-limit/status")
+async def rate_limit_status(req: Request, db: Session = Depends(get_db)):
+    """Return current daily usage for the caller's IP."""
+    ip = get_client_ip(req)
+    return get_status(ip, db)
+
+
 @router.post("/analyze", response_model=AnalyzeResponse)
 async def analyze_video(request: AnalyzeRequest, req: Request, db: Session = Depends(get_db)):
     """Analyze a single YouTube video and save results."""
     try:
+        ip = get_client_ip(req)
+        allowed, used, limit = check_and_increment(ip, db)
+        if not allowed:
+            raise HTTPException(
+                status_code=429,
+                detail=f"Günlük ücretsiz limit doldu ({limit} analiz/gün). Yarın tekrar deneyin.",
+                headers={"X-RateLimit-Limit": str(limit), "X-RateLimit-Used": str(used)},
+            )
+
         # Check if this is a playlist URL (warn the user)
         if youtube_service.is_playlist_url(request.video_url):
             # Extract video_id anyway (watch?v=...&list=... has both)
@@ -119,6 +136,15 @@ async def analyze_video(request: AnalyzeRequest, req: Request, db: Session = Dep
 async def analyze_manual(request: ManualAnalyzeRequest, req: Request, db: Session = Depends(get_db)):
     """Analyze manually provided transcript and save results."""
     try:
+        ip = get_client_ip(req)
+        allowed, used, limit = check_and_increment(ip, db)
+        if not allowed:
+            raise HTTPException(
+                status_code=429,
+                detail=f"Günlük ücretsiz limit doldu ({limit} analiz/gün). Yarın tekrar deneyin.",
+                headers={"X-RateLimit-Limit": str(limit), "X-RateLimit-Used": str(used)},
+            )
+
         if len(request.transcript_text.strip()) < 50:
             raise HTTPException(
                 status_code=400, detail="Transkript çok kısa (minimum 50 karakter)"
@@ -204,6 +230,15 @@ async def analyze_playlist(
 ):
     """Analyze selected videos from a playlist (individual or combined mode)."""
     try:
+        ip = get_client_ip(req)
+        allowed, used, limit = check_and_increment(ip, db)
+        if not allowed:
+            raise HTTPException(
+                status_code=429,
+                detail=f"Günlük ücretsiz limit doldu ({limit} analiz/gün). Yarın tekrar deneyin.",
+                headers={"X-RateLimit-Limit": str(limit), "X-RateLimit-Used": str(used)},
+            )
+
         playlist_id = youtube_service.extract_playlist_id(request.playlist_url)
         if not playlist_id:
             raise HTTPException(
@@ -226,7 +261,7 @@ async def analyze_playlist(
             transcripts = []
             for vid in video_ids:
                 try:
-                    text, lang = youtube_service.get_transcript(vid)
+                    text, _ = youtube_service.get_transcript(vid)
                     info = youtube_service.get_video_info(vid)
                     transcripts.append({"title": info["title"], "text": text, "video_id": vid})
                 except Exception as e:
@@ -243,8 +278,6 @@ async def analyze_playlist(
             combined_transcript = "\n\n".join(
                 [f"[{t['title']}]\n{t['text']}" for t in transcripts]
             )
-            video_titles = ", ".join([t["title"] for t in transcripts])
-
             db_analysis = VideoAnalysis(
                 video_url=request.playlist_url,
                 video_id=",".join([t["video_id"] for t in transcripts]),
