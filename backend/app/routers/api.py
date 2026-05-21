@@ -36,9 +36,13 @@ def get_openai_service():
 
 
 def get_ui_lang(request: Request) -> str:
-    """Accept-Language header'ından UI dilini çıkar. Varsayılan: tr."""
-    header = request.headers.get("accept-language", "tr")
-    lang = header.split(",")[0].split(";")[0].split("-")[0].strip().lower()
+    """Uygulamanın aktif dilini okur. X-UI-Language header'ı öncelikli. Varsayılan: tr."""
+    lang = request.headers.get("x-ui-language", "").strip().lower()
+    if lang in ("tr", "en"):
+        return lang
+    # Fallback: Accept-Language (ilk dil kodu)
+    accept = request.headers.get("accept-language", "tr")
+    lang = accept.split(",")[0].split(";")[0].split("-")[0].strip().lower()
     return lang if lang in ("tr", "en") else "tr"
 
 

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import i18n from '../i18n';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -7,6 +8,12 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Her istekte uygulamanın aktif dilini header'a ekle
+api.interceptors.request.use((config) => {
+  config.headers['X-UI-Language'] = i18n.language || 'tr';
+  return config;
 });
 
 // --- Single Video ---
