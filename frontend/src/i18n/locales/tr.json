@@ -1,0 +1,101 @@
+{
+  "app": {
+    "title": "YouTube Transkript Analiz",
+    "subtitle": "YouTube videolarından otomatik transkript çıkarıp AI ile analiz edin",
+    "tabs": {
+      "youtube": "📺 YouTube URL",
+      "manual": "✍️ Manuel Transkript",
+      "playlist": "📋 Oynatma Listesi"
+    },
+    "language": "Dil",
+    "loading": "Yükleniyor..."
+  },
+  "analyze": {
+    "title": "Video Analiz Et",
+    "urlLabel": "YouTube Video URL",
+    "urlPlaceholder": "https://www.youtube.com/watch?v=...",
+    "button": "Analiz Et",
+    "analyzing": "Analiz Ediliyor...",
+    "error": "Hata",
+    "genericError": "Bir hata oluştu"
+  },
+  "manual": {
+    "title": "Manuel Transkript Girişi",
+    "description": "Elinizde hazır bir transkript varsa buradan doğrudan analiz edebilirsiniz.",
+    "titleLabel": "Başlık",
+    "titlePlaceholder": "Örn: Python Programlama Dersi",
+    "sourceUrlLabel": "Kaynak URL (Opsiyonel)",
+    "sourceUrlPlaceholder": "https://example.com/video",
+    "transcriptLabel": "Transkript Metni (Minimum 50 karakter)",
+    "transcriptPlaceholder": "Transkript metnini buraya yapıştırın...",
+    "charCount": "{{count}} karakter",
+    "charNeeded": "({{count}} daha gerekli)",
+    "charOk": "✓",
+    "clear": "Temizle",
+    "tips": {
+      "title": "💡 İpuçları:",
+      "tip1": "Transkript ne kadar detaylı olursa analiz o kadar iyi olur",
+      "tip2": "Türkçe veya İngilizce transkriptler en iyi sonucu verir",
+      "tip3": "Podcast, konuşma, ders notları gibi içerikler için idealdir"
+    }
+  },
+  "playlist": {
+    "title": "Oynatma Listesi Analizi",
+    "description": "YouTube oynatma listesi URL'sini girin ve videoları seçerek analiz edin.",
+    "urlLabel": "Oynatma Listesi URL",
+    "urlPlaceholder": "https://www.youtube.com/playlist?list=...",
+    "fetchButton": "Videoları Getir",
+    "fetching": "Videolar Getiriliyor...",
+    "selectAll": "Tümünü Seç",
+    "deselectAll": "Seçimi Temizle",
+    "selectedCount": "{{count}} video seçildi",
+    "mode": {
+      "label": "Analiz Modu",
+      "individual": "Teker Teker Analiz",
+      "individualDesc": "Her video ayrı ayrı analiz edilir",
+      "combined": "Toplu Özet",
+      "combinedDesc": "Seçilen videoların ortak özeti oluşturulur"
+    },
+    "analyzeButton": "Seçilenleri Analiz Et",
+    "analyzing": "Analiz Ediliyor ({{current}}/{{total}})...",
+    "noVideos": "Oynatma listesinde video bulunamadı",
+    "maxWarning": "En fazla 15 video seçebilirsiniz"
+  },
+  "result": {
+    "title": "Analiz Sonucu",
+    "video": "Video",
+    "summary": "📝 Kısa Özet",
+    "videoSummary": "🎬 Kapsamlı Özet",
+    "prompt": "💡 Önerilen Prompt",
+    "detailedPrompt": "🚀 Detaylı Prompt",
+    "keywords": "🏷️ Anahtar Kelimeler",
+    "keywordSummary": "🔍 Anahtar Kelime Açıklamaları",
+    "contentType": "📂 İçerik Türü",
+    "targetAudience": "👥 Hedef Kitle",
+    "keyQuotes": "💬 Öne Çıkan Alıntılar",
+    "actionItems": "✅ Aksiyon Maddeleri",
+    "difficultyLevel": "📊 Zorluk Seviyesi",
+    "sentiment": "🎭 Duygu Tonu",
+    "oneLiner": "✨ Tek Cümle Özet",
+    "language": "Dil",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı!",
+    "playlistBadge": "Oynatma Listesi",
+    "tabs": {
+      "overview": "Genel Bakış",
+      "fullSummary": "Kapsamlı Özet",
+      "keywords": "Anahtar Kelimeler",
+      "prompts": "AI Prompts",
+      "details": "Alıntılar & Aksiyonlar"
+    }
+  },
+  "history": {
+    "title": "Geçmiş Analizler",
+    "empty": "Henüz analiz yapılmamış.",
+    "delete": "Sil",
+    "deleteConfirm": "Bu analizi silmek istediğinizden emin misiniz?",
+    "deleteSuccess": "Analiz silindi",
+    "deleteError": "Silme işlemi başarısız",
+    "detailError": "Detay yüklenemedi"
+  }
+}

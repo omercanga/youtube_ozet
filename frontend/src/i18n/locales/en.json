@@ -1,0 +1,101 @@
+{
+  "app": {
+    "title": "YouTube Transcript Analyzer",
+    "subtitle": "Extract transcripts from YouTube videos and analyze them with AI",
+    "tabs": {
+      "youtube": "📺 YouTube URL",
+      "manual": "✍️ Manual Transcript",
+      "playlist": "📋 Playlist"
+    },
+    "language": "Language",
+    "loading": "Loading..."
+  },
+  "analyze": {
+    "title": "Analyze Video",
+    "urlLabel": "YouTube Video URL",
+    "urlPlaceholder": "https://www.youtube.com/watch?v=...",
+    "button": "Analyze",
+    "analyzing": "Analyzing...",
+    "error": "Error",
+    "genericError": "An error occurred"
+  },
+  "manual": {
+    "title": "Manual Transcript Input",
+    "description": "If you have a ready transcript, you can analyze it directly here.",
+    "titleLabel": "Title",
+    "titlePlaceholder": "e.g., Python Programming Lesson",
+    "sourceUrlLabel": "Source URL (Optional)",
+    "sourceUrlPlaceholder": "https://example.com/video",
+    "transcriptLabel": "Transcript Text (Minimum 50 characters)",
+    "transcriptPlaceholder": "Paste your transcript text here...",
+    "charCount": "{{count}} characters",
+    "charNeeded": "({{count}} more needed)",
+    "charOk": "✓",
+    "clear": "Clear",
+    "tips": {
+      "title": "💡 Tips:",
+      "tip1": "The more detailed the transcript, the better the analysis",
+      "tip2": "Turkish or English transcripts give the best results",
+      "tip3": "Ideal for podcasts, talks, lecture notes, and similar content"
+    }
+  },
+  "playlist": {
+    "title": "Playlist Analysis",
+    "description": "Enter a YouTube playlist URL, select videos and analyze them.",
+    "urlLabel": "Playlist URL",
+    "urlPlaceholder": "https://www.youtube.com/playlist?list=...",
+    "fetchButton": "Fetch Videos",
+    "fetching": "Fetching Videos...",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "selectedCount": "{{count}} videos selected",
+    "mode": {
+      "label": "Analysis Mode",
+      "individual": "Individual Analysis",
+      "individualDesc": "Each video is analyzed separately",
+      "combined": "Combined Summary",
+      "combinedDesc": "A combined summary of selected videos is created"
+    },
+    "analyzeButton": "Analyze Selected",
+    "analyzing": "Analyzing ({{current}}/{{total}})...",
+    "noVideos": "No videos found in the playlist",
+    "maxWarning": "You can select up to 15 videos"
+  },
+  "result": {
+    "title": "Analysis Result",
+    "video": "Video",
+    "summary": "📝 Summary",
+    "videoSummary": "🎬 Full Summary",
+    "prompt": "💡 Suggested Prompt",
+    "detailedPrompt": "🚀 Detailed Prompt",
+    "keywords": "🏷️ Keywords",
+    "keywordSummary": "🔍 Keyword Explanations",
+    "contentType": "📂 Content Type",
+    "targetAudience": "👥 Target Audience",
+    "keyQuotes": "💬 Key Quotes",
+    "actionItems": "✅ Action Items",
+    "difficultyLevel": "📊 Difficulty Level",
+    "sentiment": "🎭 Sentiment",
+    "oneLiner": "✨ One-liner",
+    "language": "Language",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "playlistBadge": "Playlist",
+    "tabs": {
+      "overview": "Overview",
+      "fullSummary": "Full Summary",
+      "keywords": "Keywords",
+      "prompts": "AI Prompts",
+      "details": "Quotes & Actions"
+    }
+  },
+  "history": {
+    "title": "Analysis History",
+    "empty": "No analyses yet.",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this analysis?",
+    "deleteSuccess": "Analysis deleted",
+    "deleteError": "Delete failed",
+    "detailError": "Could not load details"
+  }
+}
