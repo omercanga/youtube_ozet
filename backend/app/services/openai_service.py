@@ -88,28 +88,42 @@ class OpenAIService:
         self.model = os.getenv("AI_MODEL", "openai/gpt-3.5-turbo")
 
     def _parse_json_response(self, content: str) -> dict:
+        # 1. Direkt parse
         try:
-            result = json.loads(content)
+            result = json.loads(content.strip())
             if isinstance(result, dict):
                 return result
         except json.JSONDecodeError:
             pass
 
-        code_block = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", content, re.DOTALL)
+        # 2. Markdown kod bloğu içinden çıkar
+        code_block = re.search(r"```(?:json)?\s*(\{.*?})\s*```", content, re.DOTALL)
         if code_block:
             try:
                 return json.loads(code_block.group(1))
             except json.JSONDecodeError:
                 pass
 
-        brace_match = re.search(r"\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", content, re.DOTALL)
-        if brace_match:
-            try:
-                return json.loads(brace_match.group())
-            except json.JSONDecodeError:
-                pass
+        # 3. Brace-counting: { } derinliğini takip ederek tam JSON'u bul
+        #    Regex'ten daha güvenilir — nested array/object destekler
+        start = content.find("{")
+        if start != -1:
+            depth = 0
+            for i, ch in enumerate(content[start:], start):
+                if ch == "{":
+                    depth += 1
+                elif ch == "}":
+                    depth -= 1
+                    if depth == 0:
+                        candidate = content[start : i + 1]
+                        try:
+                            result = json.loads(candidate)
+                            if isinstance(result, dict):
+                                return result
+                        except json.JSONDecodeError:
+                            break
 
-        logger.warning(f"Could not parse JSON from AI response: {content[:200]}...")
+        logger.warning(f"Could not parse JSON from AI response: {content[:300]}...")
         return {key: "" for key in _REQUIRED_KEYS}
 
     def _normalize_result(self, raw: dict) -> dict:
