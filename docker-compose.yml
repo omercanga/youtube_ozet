@@ -7,6 +7,10 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       AI_MODEL: ${AI_MODEL:-openai/gpt-3.5-turbo}
       CORS_ORIGINS: "http://localhost:5180,http://localhost:3000"
+      MAX_TRANSCRIPT_CHARS: ${MAX_TRANSCRIPT_CHARS:-8000}
+      SUPADATA_API_KEY: ${SUPADATA_API_KEY:-}
+      YOUTUBE_COOKIES_PATH: "/app/data/cookies.txt"
+      FREE_DAILY_LIMIT: ${FREE_DAILY_LIMIT:-5}
     ports:
       - "8001:8000"
     volumes:
