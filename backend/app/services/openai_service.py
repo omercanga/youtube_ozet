@@ -8,8 +8,11 @@ import httpx
 logger = logging.getLogger(__name__)
 
 _SINGLE_VIDEO_SYSTEM_PROMPT = """Sen uzman bir video içerik analiz asistanısın.
-Verilen transkripti derinlemesine analiz edip Türkçe olarak aşağıdaki JSON'u üret.
+Verilen transkripti derinlemesine analiz et ve aşağıdaki JSON'u üret.
 SADECE geçerli JSON döndür. Başka metin, yorum veya markdown ekleme.
+
+ÖNEMLİ — DİL KURALI:
+{lang_instruction}
 
 {
   "one_liner": "Videonun tek cümlelik özü. Sosyal medyada paylaşılabilir, 15-20 kelimeyi geçmez.",
@@ -29,8 +32,11 @@ SADECE geçerli JSON döndür. Başka metin, yorum veya markdown ekleme.
 
 _PLAYLIST_SYSTEM_PROMPT = """Sen uzman bir video serisi analiz asistanısın.
 Bir oynatma listesindeki birden fazla videonun transkriptleri verilmiştir.
-Tümünü bir bütün olarak analiz edip Türkçe olarak aşağıdaki JSON'u üret.
+Tümünü bir bütün olarak analiz et ve aşağıdaki JSON'u üret.
 SADECE geçerli JSON döndür. Başka metin, yorum veya markdown ekleme.
+
+ÖNEMLİ — DİL KURALI:
+{lang_instruction}
 
 {
   "one_liner": "Oynatma listesinin tek cümlelik özü. 15-20 kelimeyi geçmez.",
@@ -47,6 +53,17 @@ SADECE geçerli JSON döndür. Başka metin, yorum veya markdown ekleme.
   "prompt": "Bu seriyi AI'a özetletmek için kısa prompt.",
   "detailed_prompt": "Seri kapsamını, öğrenme hedeflerini ve beklenen çıktıyı içeren detaylı prompt."
 }"""
+
+_LANG_INSTRUCTIONS = {
+    "tr": "Tüm çıktıları Türkçe yaz. Teknik terimler ve özel isimler orijinal dilinde kalabilir.",
+    "en": "Write all outputs in English. Technical terms and proper nouns may stay in their original language.",
+}
+
+
+def _build_prompt(template: str, ui_lang: str) -> str:
+    instruction = _LANG_INSTRUCTIONS.get(ui_lang[:2].lower(), _LANG_INSTRUCTIONS["tr"])
+    return template.replace("{lang_instruction}", instruction)
+
 
 _REQUIRED_KEYS = [
     "one_liner", "summary", "video_summary", "prompt", "detailed_prompt",
@@ -131,15 +148,16 @@ class OpenAIService:
             "difficulty_level": _to_str(raw.get("difficulty_level")),
         }
 
-    def analyze_transcript(self, transcript: str) -> dict:
+    def analyze_transcript(self, transcript: str, ui_lang: str = "tr") -> dict:
         try:
             max_chars = int(os.getenv("MAX_TRANSCRIPT_CHARS", "8000"))
             trimmed = transcript[:max_chars]
+            system_prompt = _build_prompt(_SINGLE_VIDEO_SYSTEM_PROMPT, ui_lang)
 
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": _SINGLE_VIDEO_SYSTEM_PROMPT},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": f"Video Transkripti:\n\n{trimmed}"},
                 ],
                 temperature=0.4,
@@ -153,7 +171,7 @@ class OpenAIService:
             logger.error(f"AI analysis error: {e}")
             raise Exception(f"AI analizi sırasında hata: {str(e)}")
 
-    def analyze_playlist_combined(self, transcripts: list[dict]) -> dict:
+    def analyze_playlist_combined(self, transcripts: list[dict], ui_lang: str = "tr") -> dict:
         try:
             max_per_video = 3000
             parts = []
@@ -162,11 +180,12 @@ class OpenAIService:
                 parts.append(f"--- Video {i}: {t['title']} ---\n{text}")
 
             combined = "\n\n".join(parts)[:15000]
+            system_prompt = _build_prompt(_PLAYLIST_SYSTEM_PROMPT, ui_lang)
 
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": _PLAYLIST_SYSTEM_PROMPT},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": f"Oynatma Listesi Transkriptleri:\n\n{combined}"},
                 ],
                 temperature=0.4,

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 from typing import List
 import logging
@@ -35,11 +35,18 @@ def get_openai_service():
     return _openai_service
 
 
+def get_ui_lang(request: Request) -> str:
+    """Accept-Language header'ından UI dilini çıkar. Varsayılan: tr."""
+    header = request.headers.get("accept-language", "tr")
+    lang = header.split(",")[0].split(";")[0].split("-")[0].strip().lower()
+    return lang if lang in ("tr", "en") else "tr"
+
+
 # --- Single Video Analysis ---
 
 
 @router.post("/analyze", response_model=AnalyzeResponse)
-async def analyze_video(request: AnalyzeRequest, db: Session = Depends(get_db)):
+async def analyze_video(request: AnalyzeRequest, req: Request, db: Session = Depends(get_db)):
     """Analyze a single YouTube video and save results."""
     try:
         # Check if this is a playlist URL (warn the user)
@@ -64,7 +71,7 @@ async def analyze_video(request: AnalyzeRequest, db: Session = Depends(get_db)):
         video_info = youtube_service.get_video_info(video_id)
 
         # Analyze with AI
-        analysis = get_openai_service().analyze_transcript(transcript_text)
+        analysis = get_openai_service().analyze_transcript(transcript_text, get_ui_lang(req))
 
         # Save to database
         db_analysis = VideoAnalysis(
@@ -105,7 +112,7 @@ async def analyze_video(request: AnalyzeRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/analyze-manual", response_model=AnalyzeResponse)
-async def analyze_manual(request: ManualAnalyzeRequest, db: Session = Depends(get_db)):
+async def analyze_manual(request: ManualAnalyzeRequest, req: Request, db: Session = Depends(get_db)):
     """Analyze manually provided transcript and save results."""
     try:
         if len(request.transcript_text.strip()) < 50:
@@ -113,7 +120,7 @@ async def analyze_manual(request: ManualAnalyzeRequest, db: Session = Depends(ge
                 status_code=400, detail="Transkript çok kısa (minimum 50 karakter)"
             )
 
-        analysis = get_openai_service().analyze_transcript(request.transcript_text)
+        analysis = get_openai_service().analyze_transcript(request.transcript_text, get_ui_lang(req))
 
         db_analysis = VideoAnalysis(
             video_url=request.source_url or "Manuel Giriş",
@@ -189,7 +196,7 @@ async def get_playlist_info(url: str = Query(..., description="YouTube playlist 
 
 @router.post("/playlist/analyze", response_model=List[AnalyzeResponse])
 async def analyze_playlist(
-    request: PlaylistAnalyzeRequest, db: Session = Depends(get_db)
+    request: PlaylistAnalyzeRequest, req: Request, db: Session = Depends(get_db)
 ):
     """Analyze selected videos from a playlist (individual or combined mode)."""
     try:
@@ -228,7 +235,7 @@ async def analyze_playlist(
                     detail="Seçilen videoların hiçbirinden transkript alınamadı",
                 )
 
-            analysis = get_openai_service().analyze_playlist_combined(transcripts)
+            analysis = get_openai_service().analyze_playlist_combined(transcripts, get_ui_lang(req))
             combined_transcript = "\n\n".join(
                 [f"[{t['title']}]\n{t['text']}" for t in transcripts]
             )
@@ -269,7 +276,7 @@ async def analyze_playlist(
                 try:
                     transcript_text, language = youtube_service.get_transcript(vid)
                     video_info = youtube_service.get_video_info(vid)
-                    analysis = get_openai_service().analyze_transcript(transcript_text)
+                    analysis = get_openai_service().analyze_transcript(transcript_text, get_ui_lang(req))
 
                     db_analysis = VideoAnalysis(
                         video_url=f"https://www.youtube.com/watch?v={vid}",
